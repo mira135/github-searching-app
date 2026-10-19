@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { GitHubApiError } from "./api/github";
+import Pagination from "./components/Pagination/Pagination";
 import RepositoryCard from "./components/RepositoryCard/RepositoryCard";
 import SearchBar from "./components/SearchBar/SearchBar";
+import { PER_PAGE } from "./constants";
 import { useRepositories } from "./hooks/useRepositories";
+import { getTotalPages } from "./utils/pagination";
 import styles from "./App.module.css";
 
 function getErrorMessage(error: Error): string {
@@ -20,9 +23,20 @@ function getErrorMessage(error: Error): string {
 
 function App() {
   const [keyword, setKeyword] = useState("");
+  const [page, setPage] = useState(1);
 
   const { data, error, isEnabled, isPending, isFetching, refetch } =
-    useRepositories({ keyword, language: "", sort: "best-match", page: 1 });
+    useRepositories({ keyword, language: "", sort: "best-match", page });
+
+  function handleSearch(newKeyword: string) {
+    setKeyword(newKeyword);
+    setPage(1);
+  }
+
+  function handlePageChange(newPage: number) {
+    setPage(newPage);
+    window.scrollTo(0, 0);
+  }
 
   function renderContent() {
     if (!isEnabled) {
@@ -82,6 +96,12 @@ function App() {
             </li>
           ))}
         </ul>
+        <Pagination
+          page={page}
+          totalPages={getTotalPages(data.total_count, PER_PAGE)}
+          disabled={isFetching}
+          onPageChange={handlePageChange}
+        />
       </>
     );
   }
@@ -89,7 +109,7 @@ function App() {
   return (
     <main className={styles.app}>
       <h1>GitHub Repository Explorer</h1>
-      <SearchBar onSearch={setKeyword} />
+      <SearchBar onSearch={handleSearch} />
       <section className={styles.content}>
         {renderContent()}
       </section>
