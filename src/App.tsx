@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import SearchBar from './components/SearchBar/SearchBar'
 import RepositoryCard from './components/RepositoryCard/RepositoryCard'
 import type { Repository } from './types/github'
 import styles from './App.module.css'
@@ -53,9 +55,13 @@ const mockRepositories: Repository[] = [
 ]
 
 function App() {
+  const [keyword, setKeyword] = useState('')
+
   return (
     <main className={styles.app}>
       <h1>GitHub Repository Explorer</h1>
+      <SearchBar onSearch={setKeyword} />
+      <p>Submitted keyword: "{keyword}"</p>
       <ul className={styles.results}>
         {mockRepositories.map((repository) => (
           <li key={repository.id}>
