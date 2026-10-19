@@ -2,12 +2,34 @@
   --font-family: "Roboto", system-ui, sans-serif;
   --color-text: #333;
   --color-text-muted: #666;
-  --color-primary: #fb8500;
-  --color-link: #023047;
+  --color-background: #f6f8fa;
+  --color-surface: #fff;
   --color-border: #ddd;
+  --color-primary: #fb8500;
+  --color-primary-hover: #c96a00;
+  --color-on-primary-hover: #fee7cc;
+  --color-accent: #ffb703;
+  --color-dark: #023047;
+  --color-dark-hover: #034a6e;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-panel: 24px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
+  margin: 0;
   font-family: var(--font-family);
   color: var(--color-text);
+  background: var(--color-background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-dark);
+  outline-offset: 2px;
 }

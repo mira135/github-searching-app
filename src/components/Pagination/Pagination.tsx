@@ -1,3 +1,4 @@
+import Button from "../Button/Button";
 import styles from "./Pagination.module.css";
 
 interface PaginationProps {
@@ -37,27 +38,26 @@ function Pagination({
 }: PaginationProps) {
   return (
     <nav className={styles.pagination} aria-label="Pagination">
-      <button
-        className={`${styles.button} ${styles.secondary}`}
-        type="button"
+      <Button
+        variant="secondary"
+        iconOnly
         aria-label="Previous page"
         disabled={disabled || page <= 1}
         onClick={() => onPageChange(page - 1)}
       >
         <ArrowIcon direction="left" />
-      </button>
+      </Button>
       <span>
         Page {page} of {totalPages}
       </span>
-      <button
-        className={styles.button}
-        type="button"
+      <Button
+        iconOnly
         aria-label="Next page"
         disabled={disabled || page >= totalPages}
         onClick={() => onPageChange(page + 1)}
       >
         <ArrowIcon direction="right" />
-      </button>
+      </Button>
     </nav>
   );
 }

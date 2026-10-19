@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { GitHubApiError } from "./api/github";
+import Button from "./components/Button/Button";
 import Pagination from "./components/Pagination/Pagination";
 import RepositoryCard from "./components/RepositoryCard/RepositoryCard";
 import SearchBar from "./components/SearchBar/SearchBar";
-import { PER_PAGE } from "./constants";
+import SearchFilters from "./components/SearchFilters/SearchFilters";
+import { PER_PAGE, type Language, type SortOption } from "./constants";
 import { useRepositories } from "./hooks/useRepositories";
 import { getTotalPages } from "./utils/pagination";
 import styles from "./App.module.css";
@@ -23,13 +25,25 @@ function getErrorMessage(error: Error): string {
 
 function App() {
   const [keyword, setKeyword] = useState("");
+  const [language, setLanguage] = useState<Language>("");
+  const [sort, setSort] = useState<SortOption>("best-match");
   const [page, setPage] = useState(1);
 
   const { data, error, isEnabled, isPending, isFetching, refetch } =
-    useRepositories({ keyword, language: "", sort: "best-match", page });
+    useRepositories({ keyword, language, sort, page });
 
   function handleSearch(newKeyword: string) {
     setKeyword(newKeyword);
+    setPage(1);
+  }
+
+  function handleLanguageChange(newLanguage: Language) {
+    setLanguage(newLanguage);
+    setPage(1);
+  }
+
+  function handleSortChange(newSort: SortOption) {
+    setSort(newSort);
     setPage(1);
   }
 
@@ -42,7 +56,7 @@ function App() {
     if (!isEnabled) {
       return (
         <p className={styles.message} role="status">
-          Enter a keyword to search GitHub repositories.
+          Enter a keyword or choose a language to search GitHub repositories.
         </p>
       );
     }
@@ -51,13 +65,13 @@ function App() {
       return (
         <div className={styles.message} role="alert">
           <p>{getErrorMessage(error)}</p>
-          <button
+          <Button
             className={styles.retryButton}
-            type="button"
+            variant="secondary"
             onClick={() => refetch()}
           >
             Retry
-          </button>
+          </Button>
         </div>
       );
     }
@@ -81,14 +95,10 @@ function App() {
     return (
       <>
         <p className={styles.summary} role="status">
-          {data.total_count.toLocaleString("en-US")} repositories
+          {data.total_count.toLocaleString("en-US")}{" "}
+          {data.total_count === 1 ? "repository" : "repositories"} found
           {isFetching && " · Updating…"}
         </p>
-        {data.incomplete_results && (
-          <p className={styles.note}>
-            GitHub returned partial results; some repositories may be missing.
-          </p>
-        )}
         <ul className={styles.results}>
           {data.items.map((repository) => (
             <li key={repository.id}>
@@ -107,13 +117,21 @@ function App() {
   }
 
   return (
-    <main className={styles.app}>
-      <h1>GitHub Repository Explorer</h1>
-      <SearchBar onSearch={handleSearch} />
-      <section className={styles.content}>
+    <>
+      <header className={styles.header}>
+        <h1 className={styles.title}>GitHub Repository Explorer</h1>
+        <SearchBar onSearch={handleSearch} />
+        <SearchFilters
+          language={language}
+          sort={sort}
+          onLanguageChange={handleLanguageChange}
+          onSortChange={handleSortChange}
+        />
+      </header>
+      <main className={`${styles.container} ${styles.main}`}>
         {renderContent()}
-      </section>
-    </main>
+      </main>
+    </>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useState, type SubmitEvent } from "react";
+import Button from "../Button/Button";
 import styles from "./SearchBar.module.css";
 
 interface SearchBarProps {
@@ -27,9 +28,9 @@ function SearchBar({ onSearch }: SearchBarProps) {
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
         />
-        <button className={styles.button} type="submit">
+        <Button type="submit" variant="dark">
           Search
-        </button>
+        </Button>
       </div>
     </form>
   );
