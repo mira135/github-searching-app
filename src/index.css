@@ -1,0 +1,9 @@
+:root {
+  --font-family: "Roboto", system-ui, sans-serif;
+  --color-text: #333;
+}
+
+body {
+  font-family: var(--font-family);
+  color: var(--color-text);
+}
