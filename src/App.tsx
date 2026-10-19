@@ -1,76 +1,100 @@
-import { useState } from 'react'
-import SearchBar from './components/SearchBar/SearchBar'
-import RepositoryCard from './components/RepositoryCard/RepositoryCard'
-import type { Repository } from './types/github'
-import styles from './App.module.css'
+import { useState } from "react";
+import { GitHubApiError } from "./api/github";
+import RepositoryCard from "./components/RepositoryCard/RepositoryCard";
+import SearchBar from "./components/SearchBar/SearchBar";
+import { useRepositories } from "./hooks/useRepositories";
+import styles from "./App.module.css";
 
-const mockRepositories: Repository[] = [
-  {
-    id: 28457823,
-    name: 'freeCodeCamp',
-    full_name: 'freeCodeCamp/freeCodeCamp',
-    html_url: 'https://github.com/freeCodeCamp/freeCodeCamp',
-    description:
-      "freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming, and computer science for free.",
-    language: 'TypeScript',
-    stargazers_count: 457477,
-    forks_count: 49695,
-    updated_at: '2026-10-19T11:55:11Z',
-    owner: {
-      login: 'freeCodeCamp',
-      avatar_url: 'https://avatars.githubusercontent.com/u/9892522?v=4',
-    },
-  },
-  {
-    id: 585146387,
-    name: 'ui',
-    full_name: 'shadcn-ui/ui',
-    html_url: 'https://github.com/shadcn-ui/ui',
-    description:
-      'Composable, accessible components with thoughtful defaults. Build your own component library with code you can customize, extend, and make your own.',
-    language: 'TypeScript',
-    stargazers_count: 125932,
-    forks_count: 13611,
-    updated_at: '2026-10-19T11:52:06Z',
-    owner: {
-      login: 'shadcn-ui',
-      avatar_url: 'https://avatars.githubusercontent.com/u/139895814?v=4',
-    },
-  },
-  {
-    id: 1,
-    name: 'no-description',
-    full_name: 'example/no-description',
-    html_url: 'https://github.com',
-    description: null,
-    language: null,
-    stargazers_count: 7,
-    forks_count: 0,
-    updated_at: '2024-01-15T09:00:00Z',
-    owner: {
-      login: 'example',
-      avatar_url: 'https://avatars.githubusercontent.com/u/9919?v=4',
-    },
-  },
-]
+function getErrorMessage(error: Error): string {
+  if (!(error instanceof GitHubApiError)) return "Something went wrong.";
+
+  switch (error.kind) {
+    case "rate-limit":
+      return "Too many searches. GitHub allows about 10 per minute without signing in. Please wait a minute and try again.";
+    case "network":
+      return "Couldn't reach GitHub. Check your connection and try again.";
+    case "http":
+      return `Something went wrong: ${error.message}`;
+  }
+}
 
 function App() {
-  const [keyword, setKeyword] = useState('')
+  const [keyword, setKeyword] = useState("");
+
+  const { data, error, isEnabled, isPending, isFetching, refetch } =
+    useRepositories({ keyword, language: "", sort: "best-match", page: 1 });
+
+  function renderContent() {
+    if (!isEnabled) {
+      return (
+        <p className={styles.message} role="status">
+          Enter a keyword to search GitHub repositories.
+        </p>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className={styles.message} role="alert">
+          <p>{getErrorMessage(error)}</p>
+          <button
+            className={styles.retryButton}
+            type="button"
+            onClick={() => refetch()}
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
+
+    if (isPending) {
+      return (
+        <p className={styles.message} role="status">
+          Loading…
+        </p>
+      );
+    }
+
+    if (data.items.length === 0) {
+      return (
+        <p className={styles.message} role="status">
+          No repositories found.
+        </p>
+      );
+    }
+
+    return (
+      <>
+        <p className={styles.summary} role="status">
+          {data.total_count.toLocaleString("en-US")} repositories
+          {isFetching && " · Updating…"}
+        </p>
+        {data.incomplete_results && (
+          <p className={styles.note}>
+            GitHub returned partial results; some repositories may be missing.
+          </p>
+        )}
+        <ul className={styles.results}>
+          {data.items.map((repository) => (
+            <li key={repository.id}>
+              <RepositoryCard repository={repository} />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
 
   return (
     <main className={styles.app}>
       <h1>GitHub Repository Explorer</h1>
       <SearchBar onSearch={setKeyword} />
-      <p>Submitted keyword: "{keyword}"</p>
-      <ul className={styles.results}>
-        {mockRepositories.map((repository) => (
-          <li key={repository.id}>
-            <RepositoryCard repository={repository} />
-          </li>
-        ))}
-      </ul>
+      <section className={styles.content}>
+        {renderContent()}
+      </section>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

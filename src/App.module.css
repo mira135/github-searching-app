@@ -4,6 +4,42 @@
   padding: 24px 16px;
 }
 
+.content {
+  margin-top: 24px;
+}
+
+.message {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.message p {
+  margin: 0;
+}
+
+.retryButton {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.summary {
+  margin: 0 0 12px;
+  color: var(--color-text-muted);
+}
+
+.note {
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
 .results {
   display: grid;
   gap: 12px;
