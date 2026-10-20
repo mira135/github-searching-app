@@ -17,6 +17,7 @@ A small React + TypeScript app for searching public GitHub repositories, built o
 Requires **Node.js 22.22+ or 24.15+**.
 
 ```bash
+git clone https://github.com/mira135/github-searching-app.git
 cd github-searching-app
 npm install
 npm run dev
@@ -26,11 +27,11 @@ Then open the URL printed in the terminal (usually http://localhost:5173).
 
 Other commands:
 
-| Command | Description |
-|---|---|
-| `npm test` | Run the tests (Vitest) |
+| Command         | Description                         |
+| --------------- | ----------------------------------- |
+| `npm test`      | Run the tests (Vitest)              |
 | `npm run build` | Type-check and build for production |
-| `npm run lint` | Run ESLint |
+| `npm run lint`  | Run ESLint                          |
 
 No GitHub token is needed. Without one, GitHub allows about **10 searches per minute**.
 
@@ -70,5 +71,4 @@ src/
 - **Handle qualifiers typed into the search box**, such as `language:go`, which can conflict with the language dropdown.
 - **Move keyboard focus to the results** after changing pages.
 - **Friendlier error messages** instead of GitHub's raw text, and skeleton cards while loading.
-- **Improve color contrast** of the orange pagination buttons.
 - **Add tests for `App`** covering the full search flow and error states.
